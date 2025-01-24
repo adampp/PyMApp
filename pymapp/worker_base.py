@@ -35,41 +35,33 @@ class WorkerBase():
             handler.close()
         root_logger.handlers.clear()
 
-    def start(
-            self,
-            subprocess_events: dict[int, EventType],
-            *args,
-            **kwargs,
-    ):
-        pass
-
-    def _start(
+    def _worker_start(
             self,
             subprocess_events: dict[int, EventType],
             *args,
             **kwargs,
     ):
         self._setup_log()
-        self.start(subprocess_events, *args, **kwargs)
+        self._registered_start(subprocess_events, *args, **kwargs)
 
-    def stop(
+    def _worker_stop(
             self,
             subprocess_events: dict[int, EventType],
             *args,
             **kwargs,
     ):
-        pass
-
-    def _stop(
-            self,
-            subprocess_events: dict[int, EventType],
-            *args,
-            **kwargs,
-    ):
-        self.stop(subprocess_events, *args, **kwargs)
+        self._registered_stop(subprocess_events, *args, **kwargs)
         self._stop_log()
 
-    def run(
+    def _worker_run(
+            self,
+            subprocess_events: dict[int, EventType],
+            *args,
+            **kwargs,
+    ):
+        self._registered_run(subprocess_events, *args, **kwargs)
+    
+    def _pass(
             self,
             subprocess_events: dict[int, EventType],
             *args,

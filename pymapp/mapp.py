@@ -1,4 +1,3 @@
-import sys
 import json
 import time
 import logging
@@ -42,13 +41,13 @@ class MApp():
     
     def worker2subprocess(self, worker: WorkerBase, loop_flag: bool, *args, **kwargs):
         return SubProcessBase(
-            main_target=worker.run,
+            main_target=worker._worker_run,
             main_loop_flag=loop_flag,
             args=args,
             kwargs=kwargs,
             name=worker.name,
-            start_target=worker._start,
-            close_target=worker._stop,
+            start_target=worker._worker_start,
+            close_target=worker._worker_stop,
             begin_flag=self.begin_flag,
             stop_flag=self.stop_flag,
         )
