@@ -35,7 +35,10 @@ class {class_name}(pymapp.MApp):
         "max_bytes": 2000000,
         "backup_count": 10,
         "queue_timeout_seconds": 0.1
-    }
+    },
+    "Watchdog": {
+        "check_period_seconds": 5
+    },
 }
 """
         )

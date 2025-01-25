@@ -52,7 +52,7 @@ class SubProcessBase():
             self.name = str(uuid.uuid4())
 
         self._main_target = main_target
-        self._main_loop_flag = main_loop_flag
+        self.main_loop_flag = main_loop_flag
         self._start_target = start_target
         self._close_target = close_target
         self._join_wait_time = join_wait_time
@@ -119,13 +119,12 @@ class SubProcessBase():
         while self._continue_flag.is_set() and not self._sync_stop_flag.is_set():
             if self._sync_begin_flag is not None and not self._sync_begin_flag.is_set():
                 time.sleep(0.001)
-                continue
-            if self._try_call(self._main_target, *args, **kwargs):
-                self._hearbeat_flag.set()
-                if not self._main_loop_flag:
+            elif self._try_call(self._main_target, *args, **kwargs):
+                if not self.main_loop_flag:
                     break
             else:
                 break
+            self._hearbeat_flag.set()
         
         logging.info(f"Main loop for {self.name} complete")
 
@@ -152,7 +151,11 @@ class SubProcessBase():
         logging.info(f"Stopping process {self.name}")
         
         self._continue_flag.clear()
-        self._subprocess.join(self._join_wait_time)
+        try:
+            self._subprocess.join(self._join_wait_time)
+        except AssertionError:
+            logging.error("Subprocess attempted to join but not started.")
+
         if self._subprocess.is_alive():
             self._subprocess.terminate()
             self._subprocess.join()

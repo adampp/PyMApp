@@ -29,10 +29,6 @@ class MyTestApplication(pymapp.MApp):
             1_000,
             ["sleepy1", "sleepy2"]
         )
-    
-    def run(self):
-        self.start()
-        time.sleep(5)
 
 
 if __name__ == "__main__":

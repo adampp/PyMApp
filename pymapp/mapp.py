@@ -95,7 +95,7 @@ class MApp():
             self.worker_instances[worker].add_shared_memory(sm)
         self.shared_memory[name] = sm
     
-    def start(self):
+    def _start(self):
         for process in self.subprocesses.values():
             process.start()
         all_started = False
@@ -104,6 +104,39 @@ class MApp():
             for process in self.subprocesses.values():
                 all_started = all_started and process.started_flag.is_set()
         self.begin_flag.set()
+
+    def _watchdog(self):
+        time.sleep(self.config["Watchdog"]["check_period_seconds"])
+
+        new_subprocesses = {}
+        for name, process in self.subprocesses.items():
+            if process.get_heartbeat():
+                process.clear_heartbeat()
+            else:
+                logging.error(f"No heartbeat detected on subprocess {name}")
+                process.stop()
+                logging.info(f"Stopped subprocess {name}")
+                new_process = self.worker2subprocess(
+                    self.worker_instances[name],
+                    process.main_loop_flag,
+                )
+                new_subprocesses[name] = new_process
+        
+        for name, new_process in new_subprocesses.items():
+            new_process : SubProcessBase
+            del self.subprocesses[name]
+            self.subprocesses[name] = new_process
+            new_process.start()
+            logging.info(f"Restarted subprocess {name}")
+
+    def run(self):
+        self._start()
+
+        try:
+            while not self.stop_flag.is_set():
+                self._watchdog()
+        except KeyboardInterrupt:
+            self.stop()
     
     def stop(self):
         self._finalizer()
@@ -112,6 +145,10 @@ class MApp():
         for process in self.subprocesses.values():
             process: SubProcessBase
             process.stop()
+        
+        for sm in self.shared_memory.values():
+            sm.unlink()
+        
         self.manager.shutdown()
         time.sleep(0.1)
         self._log_process.stop()
