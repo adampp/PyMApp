@@ -17,6 +17,18 @@ class MyTestApplication(pymapp.MApp):
             loop_flag=True,
             start_i=10
         )
+        self.create_subprocess(
+            name="sleepy2",
+            instance="SleepyWorker",
+            loop_flag=True,
+            start_i=2,
+        )
+
+        self.add_shared_memory(
+            "test",
+            1_000,
+            ["sleepy1", "sleepy2"]
+        )
     
     def run(self):
         self.start()

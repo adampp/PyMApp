@@ -3,6 +3,7 @@ import logging.handlers
 import multiprocessing as mp
 
 from .constants import *
+from .shared_memory import PyMAppSharedMemory
 
 class WorkerBase():
     def __init__(
@@ -10,14 +11,14 @@ class WorkerBase():
             name: str,
             config: dict,
             log_queue: mp.Queue,
-            queues: dict,
-            values: dict,
             ):
         self.name = name
         self.config = config
         self._log_queue = log_queue
-        self.queues = queues
-        self.values = values
+        self.shared_memory = {}
+    
+    def add_shared_memory(self, sm: PyMAppSharedMemory):
+        self.shared_memory[sm.name] = sm
 
     def _setup_log(self):
         root_logger = logging.getLogger()

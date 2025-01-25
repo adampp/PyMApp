@@ -16,9 +16,11 @@ class WorkerRegistry:
                 cls_self.name = name
                 cls_self.config = config
                 cls_self._log_queue = log_queue
+                cls_self.shared_memory = {}
                 original_init(cls_self, *args, **kwargs)
             cls.__init__ = __init__
 
+            cls.add_shared_memory = WorkerBase.add_shared_memory
             cls._setup_log = WorkerBase._setup_log
             cls._stop_log = WorkerBase._stop_log
             if cls.__name__ in self.start_methods:

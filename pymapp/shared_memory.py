@@ -6,8 +6,17 @@ from multiprocessing.shared_memory import SharedMemory
 from .constants import *
 
 class PyMAppSharedMemory():
-    def __init__(self, name: str, size: int, create: bool, mutex: LockType):
+    def __init__(
+            self,
+            name: str,
+            size: int,
+            create: bool,
+            mutex: LockType,
+            workers: list[str],
+    ):
         mutex.acquire()
+        self.workers = workers
+        self.name = name
         self._size = size
         temp_size = bytearray(size).__sizeof__()
 

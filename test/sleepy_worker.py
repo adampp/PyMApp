@@ -4,7 +4,7 @@ import logging
 import pymapp
 
 @pymapp.register()
-class SleepyWorker():
+class SleepyWorker(pymapp.WorkerBase):
     def __init__(self, start_i):
         self.i = start_i
 
@@ -24,7 +24,12 @@ class SleepyWorker():
             *args,
             **kwargs,
     ):
-        logging.info(f"sleep count = {self.i}")
+        if self.name == "sleepy1":
+            self.shared_memory['test'].write(f"hi from sleepy1! {self.i}")
+            read_str = "wrote"
+        elif self.name == "sleepy2":
+            read_str = self.shared_memory['test'].read()
+        logging.info(f"{self.name} count = {self.i} : {read_str}")
         time.sleep(1)
         self.i += 1
 
