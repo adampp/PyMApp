@@ -13,8 +13,6 @@ class SubProcessBase():
             self,
             main_target: Callable,
             main_loop_flag: bool = True,
-            args: tuple = (),
-            kwargs: dict = {},
             name: str = None,
             start_target: Callable = None,
             close_target: Callable = None,
@@ -31,10 +29,6 @@ class SubProcessBase():
             main worker function for this subprocess
         main_loop_flag : bool, optional
             whether or not to loop main_target, by default True
-        args : tuple, optional
-            arguments to the start, main, and close functions, by default ()
-        kwargs : dict, optional
-            keyword arguments to the start, main, and close functions, by default {}
         name : str, optional
             name of this subprocess, by default None
         start_target : Callable, optional
@@ -59,8 +53,6 @@ class SubProcessBase():
 
         self._main_target = main_target
         self._main_loop_flag = main_loop_flag
-        self._args = args
-        self._kwargs = kwargs
         self._start_target = start_target
         self._close_target = close_target
         self._join_wait_time = join_wait_time
@@ -87,8 +79,6 @@ class SubProcessBase():
         self._subprocess = mp.Process(
             target=self._main_loop,
             name=name,
-            args=args,
-            kwargs=kwargs,
         )
 
     def _try_call(self, try_func: Callable, *args, **kwargs) -> bool:

@@ -5,8 +5,8 @@ import pymapp
 
 @pymapp.register()
 class SleepyWorker():
-    def __init__(self):
-        self.i = 0
+    def __init__(self, start_i):
+        self.i = start_i
 
     @pymapp.start_method()
     def start(

@@ -39,12 +39,10 @@ class MApp():
         self.begin_flag = mp.Event()
         self.stop_flag = mp.Event()
     
-    def worker2subprocess(self, worker: WorkerBase, loop_flag: bool, *args, **kwargs):
+    def worker2subprocess(self, worker: WorkerBase, loop_flag: bool):
         return SubProcessBase(
             main_target=worker._worker_run,
             main_loop_flag=loop_flag,
-            args=args,
-            kwargs=kwargs,
             name=worker.name,
             start_target=worker._worker_start,
             close_target=worker._worker_stop,
@@ -57,23 +55,19 @@ class MApp():
             name: str,
             instance: str,
             loop_flag: bool,
-            queues: dict[str, mp.Queue],
-            values: dict[str, object],
             *args,
             **kwargs
     ):
         self.worker_instances[name] = self.worker_registry[instance](
-            name=name,
-            config=self.config[instance],
-            log_queue=self._log_queue,
-            queues=queues,
-            values=values,
+            name,
+            self.config[instance],
+            self._log_queue,
+            *args,
+            **kwargs
         )
         self.subprocesses[name] = self.worker2subprocess(
             self.worker_instances[name],
             loop_flag=loop_flag,
-            *args,
-            **kwargs
         )
         self.subprocesses[name].start()
     

@@ -1,5 +1,6 @@
 import enum
 from multiprocessing.synchronize import Event as EventType
+from multiprocessing.synchronize import Lock as LockType
 
 # Event Dictionary keys
 class EventDictKeys(enum.Enum):

@@ -12,12 +12,10 @@ class WorkerRegistry:
     def register_class(self):
         def make_worker(cls):
             original_init = cls.__init__
-            def __init__(cls_self, name, config, log_queue, queues, values, *args, **kwargs):
+            def __init__(cls_self, name, config, log_queue, *args, **kwargs):
                 cls_self.name = name
                 cls_self.config = config
                 cls_self._log_queue = log_queue
-                cls_self.queues = queues
-                cls_self.values = values
                 original_init(cls_self, *args, **kwargs)
             cls.__init__ = __init__
 

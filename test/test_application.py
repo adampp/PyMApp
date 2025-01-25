@@ -15,8 +15,7 @@ class MyTestApplication(pymapp.MApp):
             name="sleepy1",
             instance="SleepyWorker",
             loop_flag=True,
-            queues = {},
-            values = {},
+            start_i=10
         )
     
     def run(self):
