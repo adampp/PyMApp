@@ -13,12 +13,23 @@ import pymapp
 
 CONFIG_LOCATION = os.path.dirname(__file__)
 
-class {class_name}(pymapp.MApp):
+@pymapp.register_mapp_class(os.path.join(CONFIG_LOCATION, "config.json"))
+class MyTestApplication(pymapp.MApp):
     def __init__(self):
-        super().__init__(os.path.join(CONFIG_LOCATION, "{config_filename}"))
-    
-    def run(self):
         pass
+
+    @pymapp.register_setup_method()
+    def setup(self):
+        pass
+    
+    @pymapp.register_main_method()
+    def main(self):
+        pass
+
+
+if __name__ == "__main__":
+    my_test = MyTestApplication()
+    my_test.start()
 """
         )
     

@@ -157,13 +157,19 @@ class MApp():
         time.sleep(self.config["Watchdog"]["check_period_seconds"])
 
         new_subprocesses = {}
+        all_alive = True
         for name, process in self._subprocesses.items():
             if process.get_heartbeat():
                 process.clear_heartbeat()
             else:
                 logging.error(f"No heartbeat detected on subprocess {name}")
                 new_subprocesses[name] = self.restart_subprocess(name)
-                
+                all_alive = False
+
+        if len(self._subprocesses) < 1:
+            logging.info(f"No subprocesses for watchdog to check.")
+        elif all_alive:
+            logging.info(f"All subprocesses alive.")        
         
         for name, new_process in new_subprocesses.items():
             new_process : SubProcessBase
