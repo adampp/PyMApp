@@ -3,7 +3,7 @@ import logging
 
 import pymapp
 
-@pymapp.register()
+@pymapp.register_worker()
 class SleepyWorker(pymapp.WorkerBase):
     def __init__(self, start_i):
         self.i = start_i
@@ -32,6 +32,8 @@ class SleepyWorker(pymapp.WorkerBase):
         logging.info(f"{self.name} count = {self.i} : {read_str}")
         time.sleep(1)
         self.i += 1
+        if self.i > 10:
+            time.sleep(6)
 
     @pymapp.stop_method()
     def stop(

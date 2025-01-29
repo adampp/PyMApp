@@ -7,10 +7,14 @@ import sleepy_worker
 
 CONFIG_LOCATION = os.path.dirname(__file__)
 
+@pymapp.register_mapp_class(os.path.join(CONFIG_LOCATION, "config.json"))
 class MyTestApplication(pymapp.MApp):
     def __init__(self):
-        super().__init__(os.path.join(CONFIG_LOCATION, "config.json"))
+        self.a = 1
+        self.b = 2
 
+    @pymapp.register_setup_method()
+    def setup(self):
         self.create_subprocess(
             name="sleepy1",
             instance="SleepyWorker",
@@ -29,8 +33,12 @@ class MyTestApplication(pymapp.MApp):
             1_000,
             ["sleepy1", "sleepy2"]
         )
+    
+    @pymapp.register_main_method()
+    def main(self):
+        print('a')
 
 
 if __name__ == "__main__":
     my_test = MyTestApplication()
-    my_test.run()
+    my_test.start()
