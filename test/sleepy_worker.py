@@ -27,8 +27,10 @@ class SleepyWorker(pymapp.WorkerBase):
         if self.name == "sleepy1":
             self.shared_memory['test'].write(f"hi from sleepy1! {self.i}")
             read_str = "wrote"
+            pymapp.send_message('sleepy2', f'I, {self.name}, am at {self.i}')
         elif self.name == "sleepy2":
             read_str = self.shared_memory['test'].read()
+            pymapp.send_message('sleepy1', f'I, {self.name}, am at {self.i}')
         logging.info(f"{self.name} count = {self.i} : {read_str}")
         time.sleep(1)
         self.i += 1
@@ -43,3 +45,7 @@ class SleepyWorker(pymapp.WorkerBase):
             **kwargs,
     ):
         logging.info('stop!')
+    
+    @pymapp.message_handler_method()
+    def message_handler(self, message):
+        logging.info(message)

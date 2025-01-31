@@ -20,7 +20,7 @@ LOGGER_LEVEL = {
 
 class LoggerWriter(WorkerBase):
     def __init__(self, log_queue, config):
-        super().__init__("log", config, log_queue)
+        super().__init__("log", config, log_queue, Queue())
 
         if self.config["clear_all_logs_on_startup"]:
             files = glob.glob(os.path.join(self.config["directory"], "*.log"))

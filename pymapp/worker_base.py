@@ -1,5 +1,6 @@
 import logging
 import logging.handlers
+from queue import Empty
 import multiprocessing as mp
 
 from .constants import *
@@ -11,10 +12,12 @@ class WorkerBase():
             name: str,
             config: dict,
             log_queue: mp.Queue,
+            message_queue: mp.Queue,
             ):
         self.name = name
         self.config = config
         self._log_queue = log_queue
+        self._message_queue = message_queue
         self.shared_memory = {}
     
     def add_shared_memory(self, sm: PyMAppSharedMemory):
@@ -53,6 +56,16 @@ class WorkerBase():
     ):
         self._registered_stop(subprocess_events, *args, **kwargs)
         self._stop_log()
+    
+    def _worker_message_getter(self):
+        messages = []
+        while True:
+            try:
+                msg = self._message_queue.get_nowait()
+            except Empty:
+                break
+            messages.append(msg)
+        return messages
 
     def _worker_run(
             self,
@@ -60,12 +73,15 @@ class WorkerBase():
             *args,
             **kwargs,
     ):
+        messages = self._worker_message_getter()
+        for message in messages:
+            self._registered_message_handler(message)
         self._registered_run(subprocess_events, *args, **kwargs)
     
-    def _pass(
-            self,
-            subprocess_events: dict[int, EventType],
-            *args,
-            **kwargs,
-    ):
-        pass
+    # def _pass(
+    #         self,
+    #         subprocess_events: dict[int, EventType],
+    #         *args,
+    #         **kwargs,
+    # ):
+    #     pass

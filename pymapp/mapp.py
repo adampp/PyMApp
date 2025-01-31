@@ -67,6 +67,7 @@ class MApp():
         self._worker_instances: dict[str, WorkerBase] = {}
         self._subprocesses: dict[str, SubProcessBase] = {}
         self._shared_memory: dict[str, PyMAppSharedMemory] = {}
+        self._message_queues: dict[str, mp.Queue] = {}
 
     
     def worker2subprocess(self, worker: WorkerBase, loop_flag: bool):
@@ -88,10 +89,13 @@ class MApp():
             *args,
             **kwargs
     ):
+        msg_q = mp.Queue()
+        self._message_queues[name] = msg_q
         self._worker_instances[name] = self._worker_registry[instance](
             name,
             self.config[instance],
             self._log_queue,
+            msg_q,
             *args,
             **kwargs
         )
@@ -191,20 +195,25 @@ class MApp():
     def _main(self):
         pass
 
+    # TODO: allow non-blocking start (for use with Django!)
     def start(self):
         self._setup()
         if not hasattr(self, '_thread'):
             raise AttributeError(f"{self.__class__.__name__} missing '_thread' attribute. Likely due to not being decorated by @pymapp.register_mapp_class(<config_location>)")
         self._thread.start()
-        try:
-            self._main()
-            while True:
-                self._thread.join(0)
-                time.sleep(0.01)
-        except KeyboardInterrupt:
-            self._stop()
+        if self._main is not None:
+            try:
+                self._main()
+                while True:
+                    self._thread.join(0)
+                    time.sleep(0.01)
+            except KeyboardInterrupt:
+                self.stop()
+        
+    def join(self):
+        self._finalizer()
 
-    def _stop(self):
+    def stop(self):
         self._finalizer()
 
     def _mapp_stop(self):

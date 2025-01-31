@@ -21,6 +21,7 @@ class MyTestApplication(pymapp.MApp):
             loop_flag=True,
             start_i=10
         )
+
         self.create_subprocess(
             name="sleepy2",
             instance="SleepyWorker",
@@ -42,3 +43,9 @@ class MyTestApplication(pymapp.MApp):
 if __name__ == "__main__":
     my_test = MyTestApplication()
     my_test.start()
+    time.sleep(3)
+    pymapp.send_message('sleepy1', "Hey sleepy1, I'm from main!")
+    time.sleep(2)
+    pymapp.send_message('sleepy2', "Hey sleepy2, I'm from main!")
+    time.sleep(2)
+    my_test.stop()

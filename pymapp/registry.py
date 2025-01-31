@@ -12,13 +12,16 @@ class MAppRegistry:
         self.worker_start_methods = {}
         self.worker_stop_methods = {}
         self.worker_run_methods = {}
-        self.main_method = do_nothing
+        self.worker_message_handler_methods = {}
+        self.mapp_class = None
+        self.main_method = None
         self.setup_method = do_nothing
     
     def register_mapp_class(self, config_location):
         def make_mapp_class(cls):
             original_init = cls.__init__
             def __init__(cls_self, *args, **kwargs):
+                self.mapp_class = cls_self
                 original_init(cls_self, *args, **kwargs)
 
                 temp = pymapp.MApp(pymapp.mapp._TestLoad_())
@@ -34,10 +37,7 @@ class MAppRegistry:
                 setattr(cls, attrib, getattr(pymapp.MApp, attrib))
             cls.__init__ = __init__
 
-            if self.main_method == do_nothing:
-                warnings.warn('No main method defined. Use @pymapp.register_main_method() to define code for main thread. doing nothing.')
-            else:
-                cls._main = self.main_method
+            cls._main = self.main_method
 
             if self.setup_method == do_nothing:
                 warnings.warn('No setup method defined. Use @pymapp.register_setup_method() to define code for setup. doing nothing.')
@@ -50,10 +50,11 @@ class MAppRegistry:
     def register_worker(self):
         def make_worker(cls):
             original_init = cls.__init__
-            def __init__(cls_self, name, config, log_queue, *args, **kwargs):
+            def __init__(cls_self, name, config, log_queue, message_queue, *args, **kwargs):
                 cls_self.name = name
                 cls_self.config = config
                 cls_self._log_queue = log_queue
+                cls_self._message_queue = message_queue
                 cls_self.shared_memory = {}
                 original_init(cls_self, *args, **kwargs)
             cls.__init__ = __init__
@@ -64,17 +65,22 @@ class MAppRegistry:
             if cls.__name__ in self.worker_start_methods:
                 cls._registered_start = self.worker_start_methods[cls.__name__]
             else:
-                cls._registered_start = pymapp.WorkerBase._pass
+                cls._registered_start = do_nothing#pymapp.WorkerBase._pass
 
             if cls.__name__ in self.worker_stop_methods:
                 cls._registered_stop = self.worker_stop_methods[cls.__name__]
             else:
-                cls._registered_stop = pymapp.WorkerBase._pass
+                cls._registered_stop = do_nothing#pymapp.WorkerBase._pass
 
             if cls.__name__ in self.worker_run_methods:
                 cls._registered_run = self.worker_run_methods[cls.__name__]
             else:
                 raise RuntimeError(f'Registered worker {cls.__name__} has no main method decorated by @pymapp.run_method')
+            
+            if cls.__name__ in self.worker_message_handler_methods:
+                cls._registered_message_handler = self.worker_message_handler_methods[cls.__name__]
+            else:
+                warnings.warn(f'Registered worker {cls.__name__} has no message handler decorated by @pymapp.message_handler_method')
 
 
             cls._worker_start = pymapp.WorkerBase._worker_start
@@ -94,6 +100,8 @@ class MAppRegistry:
                 self.worker_stop_methods[cls_name] = func
             elif method_type == 'run':
                 self.worker_run_methods[cls_name] = func
+            elif method_type == 'message_handler':
+                self.worker_message_handler_methods[cls_name] = func
             elif method_type == 'main':
                 self.main_method = func
             elif method_type == 'setup':
@@ -133,3 +141,6 @@ def stop_method():
 
 def run_method():
     return _registry.register_method('run')
+
+def message_handler_method():
+    return _registry.register_method('message_handler')
