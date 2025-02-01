@@ -96,6 +96,7 @@ class MApp():
             self.config[instance],
             self._log_queue,
             msg_q,
+            _registry.message_queues,
             *args,
             **kwargs
         )

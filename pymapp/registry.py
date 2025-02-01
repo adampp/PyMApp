@@ -13,7 +13,7 @@ class MAppRegistry:
         self.worker_stop_methods = {}
         self.worker_run_methods = {}
         self.worker_message_handler_methods = {}
-        self.mapp_class = None
+        self.message_queues = None
         self.main_method = None
         self.setup_method = do_nothing
     
@@ -21,7 +21,6 @@ class MAppRegistry:
         def make_mapp_class(cls):
             original_init = cls.__init__
             def __init__(cls_self, *args, **kwargs):
-                self.mapp_class = cls_self
                 original_init(cls_self, *args, **kwargs)
 
                 temp = pymapp.MApp(pymapp.mapp._TestLoad_())
@@ -31,6 +30,7 @@ class MAppRegistry:
                         warnings.warn(f"Attribute '{key}' in '{cls.__name__}' would be overridden by PyMApp. Consider using a different name.")
                         
                 cls_self._construct(config_location)
+                self.message_queues = cls_self._message_queues
             
             method_attribs = {x for x in dir(pymapp.MApp) if x[:2] != "__"}
             for attrib in method_attribs:
@@ -50,11 +50,12 @@ class MAppRegistry:
     def register_worker(self):
         def make_worker(cls):
             original_init = cls.__init__
-            def __init__(cls_self, name, config, log_queue, message_queue, *args, **kwargs):
+            def __init__(cls_self, name, config, log_queue, message_queue, sender_queues, *args, **kwargs):
                 cls_self.name = name
                 cls_self.config = config
                 cls_self._log_queue = log_queue
                 cls_self._message_queue = message_queue
+                cls_self._sender_queues = sender_queues
                 cls_self.shared_memory = {}
                 original_init(cls_self, *args, **kwargs)
             cls.__init__ = __init__

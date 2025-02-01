@@ -47,5 +47,5 @@ if __name__ == "__main__":
     pymapp.send_message('sleepy1', "Hey sleepy1, I'm from main!")
     time.sleep(2)
     pymapp.send_message('sleepy2', "Hey sleepy2, I'm from main!")
-    time.sleep(2)
+    time.sleep(10)
     my_test.stop()
