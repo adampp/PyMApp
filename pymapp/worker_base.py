@@ -13,11 +13,13 @@ class WorkerBase():
             config: dict,
             log_queue: mp.Queue,
             message_queue: mp.Queue,
+            sender_queues: mp.Queue,
             ):
         self.name = name
         self.config = config
         self._log_queue = log_queue
         self._message_queue = message_queue
+        self._sender_queues = sender_queues
         self.shared_memory = {}
     
     def add_shared_memory(self, sm: PyMAppSharedMemory):

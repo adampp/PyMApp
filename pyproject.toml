@@ -59,7 +59,7 @@ requires-python = ">=3.10"
 # This is either text indicating the license for the distribution, or a file
 # that contains the license.
 # https://packaging.python.org/en/latest/specifications/core-metadata/#license
-license = { file = "LICENSE.txt" }
+license = { file = "LICENSE" }
 
 # This field adds keywords for your project which will appear on the
 # project page. What does your project relate to?
@@ -162,3 +162,8 @@ sample = "create_skeleton:create_skeleton"
 # If there are data files included in your packages that need to be
 # installed, specify them here.
 # package-data = { "sample" = ["*.dat"] }
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]

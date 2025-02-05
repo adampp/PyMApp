@@ -3,6 +3,8 @@ import time
 import pymapp
 import logging
 
+import pytest
+
 import sleepy_worker
 
 CONFIG_LOCATION = os.path.dirname(__file__)

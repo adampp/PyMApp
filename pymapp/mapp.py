@@ -196,7 +196,6 @@ class MApp():
     def _main(self):
         pass
 
-    # TODO: allow non-blocking start (for use with Django!)
     def start(self):
         self._setup()
         if not hasattr(self, '_thread'):
