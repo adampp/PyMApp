@@ -12,18 +12,21 @@ def get_mapp_class():
     
     test_app = MyTestApplication()
     test_app._setup()
-    return test_app
+    yield test_app
+
+    test_app.stop()
 
 @pytest.fixture
 def get_worker(get_mapp_class: pymapp.MApp):
-    return get_mapp_class._worker_instances["sleepy1"]
+    yield get_mapp_class._worker_instances["sleepy1"]
 
+def mem_addr(x):
+    return hex(int(object.__repr__(x).partition('object at ')[2].strip('>'), 16))
 
 def test_worker_decorator(get_worker:pymapp.WorkerBase):
     assert get_worker.name == "sleepy1"
     assert "test_key" in get_worker.config
     assert get_worker.config["test_key"] == "test_value"
-    print(get_worker._log_queue)
     assert isinstance(get_worker._log_queue, mp.queues.Queue)
     assert isinstance(get_worker._message_queue, mp.queues.Queue)
     assert isinstance(get_worker._sender_queues, dict)
@@ -32,7 +35,6 @@ def test_worker_decorator(get_worker:pymapp.WorkerBase):
     assert isinstance(get_worker._sender_queues["sleepy1"], mp.queues.Queue)
     assert isinstance(get_worker._sender_queues["sleepy2"], mp.queues.Queue)
     assert "test" in get_worker.shared_memory
-    print(get_worker.shared_memory["test"])
     assert isinstance(get_worker.shared_memory["test"], pymapp.shared_memory.PyMAppSharedMemory)
 
     assert callable(get_worker.add_shared_memory)
@@ -47,8 +49,28 @@ def test_worker_decorator(get_worker:pymapp.WorkerBase):
     assert callable(get_worker._worker_run)
 
     assert "SleepyWorker" in pymapp.registry._registry.workers
-    print(pymapp.registry._registry.workers["SleepyWorker"])
-    import sleepy_worker
-    print(pymapp.registry._registry.workers["SleepyWorker"] is sleepy_worker.SleepyWorker)
-    del sleepy_worker
+
+    from sleepy_worker import SleepyWorker
+    assert pymapp.registry._registry.workers["SleepyWorker"] is SleepyWorker
+    del SleepyWorker
     
+def test_register_start(get_worker:pymapp.WorkerBase):
+    from sleepy_worker import SleepyWorker
+    registry = pymapp.registry._registry
+    assert SleepyWorker.start is registry.worker_start_methods["SleepyWorker"]
+    assert SleepyWorker.start is get_worker._registered_start.__func__
+    del SleepyWorker
+    
+def test_register_run(get_worker:pymapp.WorkerBase):
+    from sleepy_worker import SleepyWorker
+    registry = pymapp.registry._registry
+    assert SleepyWorker.run is registry.worker_run_methods["SleepyWorker"]
+    assert SleepyWorker.run is get_worker._registered_run.__func__
+    del SleepyWorker
+    
+def test_register_stop(get_worker:pymapp.WorkerBase):
+    from sleepy_worker import SleepyWorker
+    registry = pymapp.registry._registry
+    assert SleepyWorker.stop is registry.worker_stop_methods["SleepyWorker"]
+    assert SleepyWorker.stop is get_worker._registered_stop.__func__
+    del SleepyWorker

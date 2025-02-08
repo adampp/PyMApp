@@ -107,13 +107,13 @@ class MAppRegistry:
                 self.main_method = func
             elif method_type == 'setup':
                 self.setup_method = func
-            def wrapper(*args, **kwargs):
-                # for worker_cls in self.workers.values():
-                #     if isinstance(args[0], worker_cls):
-                #         print('a', args[0])
-                retval = func(*args, **kwargs)
-                return retval
-            return wrapper
+            # def wrapper(*args, **kwargs):
+            #     # for worker_cls in self.workers.values():
+            #     #     if isinstance(args[0], worker_cls):
+            #     #         print('a', args[0])
+            #     retval = func(*args, **kwargs)
+            #     return retval
+            return func
         return decorator
 
 
