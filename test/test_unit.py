@@ -74,3 +74,24 @@ def test_register_stop(get_worker:pymapp.WorkerBase):
     assert SleepyWorker.stop is registry.worker_stop_methods["SleepyWorker"]
     assert SleepyWorker.stop is get_worker._registered_stop.__func__
     del SleepyWorker
+
+def test_register_message_handler(get_worker:pymapp.WorkerBase):
+    from sleepy_worker import SleepyWorker
+    registry = pymapp.registry._registry
+    assert SleepyWorker.message_handler is registry.worker_message_handler_methods["SleepyWorker"]
+    assert SleepyWorker.message_handler is get_worker._registered_message_handler.__func__
+    del SleepyWorker
+
+def test_register_main(get_mapp_class:pymapp.MApp):
+    from application import MyTestApplication
+    registry = pymapp.registry._registry
+    assert MyTestApplication.main is registry.main_method
+    assert MyTestApplication.main is get_mapp_class._main.__func__
+    del MyTestApplication
+
+def test_register_setup(get_mapp_class:pymapp.MApp):
+    from application import MyTestApplication
+    registry = pymapp.registry._registry
+    assert MyTestApplication.setup is registry.setup_method
+    assert MyTestApplication.setup is get_mapp_class._setup.__func__
+    del MyTestApplication
