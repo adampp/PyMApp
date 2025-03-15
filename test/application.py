@@ -39,7 +39,10 @@ class MyTestApplication(pymapp.MApp):
     
     @pymapp.register_main_method()
     def main(self):
-        print('a')
+        time.sleep(5)
+        # do not return or return False/None to wait until keyboard interrupt
+        # return True to stop immediately
+        return True
 
 
 if __name__ == "__main__":

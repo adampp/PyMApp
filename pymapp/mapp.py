@@ -203,12 +203,13 @@ class MApp():
         self._thread.start()
         if self._main is not None:
             try:
-                self._main()
-                while True:
+                stop_flag = self._main()
+                while not stop_flag:
                     self._thread.join(0)
                     time.sleep(0.01)
             except KeyboardInterrupt:
-                self.stop()
+                pass
+        self.stop()
         
     def join(self):
         self._finalizer()

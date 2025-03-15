@@ -1,4 +1,5 @@
 import os
+import time
 import pytest
 import multiprocessing as mp
 
@@ -95,3 +96,8 @@ def test_register_setup(get_mapp_class:pymapp.MApp):
     assert MyTestApplication.setup is registry.setup_method
     assert MyTestApplication.setup is get_mapp_class._setup.__func__
     del MyTestApplication
+
+def test_run():
+    from application import MyTestApplication
+    my_test = MyTestApplication()
+    my_test.start()
