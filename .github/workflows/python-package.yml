@@ -41,6 +41,7 @@ jobs:
         echo BREAK BREAK
         pytest -m "not serial"
         echo BREAK BREAK
+        rm logs/log.log
         pytest -m "serial"
         echo BREAK BREAK
         cat logs/log.log

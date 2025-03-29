@@ -167,3 +167,6 @@ sample = "create_skeleton:create_skeleton"
 pythonpath = [
   "."
 ]
+markers = [
+    "serial",
+]
