@@ -38,4 +38,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest --cov
+        echo BREAK BREAK
+        echo BREAK BREAK
         cat logs/log.log
