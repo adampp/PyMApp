@@ -39,5 +39,8 @@ jobs:
       run: |
         pytest --cov
         echo BREAK BREAK
+        pytest -m "not serial"
+        echo BREAK BREAK
+        pytest -m "serial"
         echo BREAK BREAK
         cat logs/log.log

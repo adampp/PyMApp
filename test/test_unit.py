@@ -97,6 +97,7 @@ def test_register_setup(get_mapp_class:pymapp.MApp):
     assert MyTestApplication.setup is get_mapp_class._setup.__func__
     del MyTestApplication
 
+@pytest.mark.serial
 def test_run():
     from application import MyTestApplication
     my_test = MyTestApplication()
