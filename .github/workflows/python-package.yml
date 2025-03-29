@@ -44,4 +44,4 @@ jobs:
         rm logs/log.log
         pytest -m "serial"
         echo BREAK BREAK
-        cat logs/log.log
+        echo $GITHUB_ACTION $GITHUB_JOB
