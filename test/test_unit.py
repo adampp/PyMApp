@@ -103,7 +103,7 @@ def test_register_setup(get_mapp_class:pymapp.MApp):
 def test_run():
     from application import MyTestApplication
     my_test = MyTestApplication()
-    log_filename = f"{os.getenv("GITHUB_ACTION")}_{os.getenv("GITHUB_JOB")}_{platform.python_version()}.log"
+    log_filename = f"{os.getenv('GITHUB_ACTION')}_{os.getenv('GITHUB_JOB')}_{platform.python_version()}.log"
     my_test._logger_writer.config["filename"] = log_filename
     my_test.start()
     with open(os.path.join('logs', log_filename), 'r') as fid:
