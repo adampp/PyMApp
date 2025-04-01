@@ -1,10 +1,12 @@
 import os
 import time
 import pytest
+import platform
 import multiprocessing as mp
 
 import pymapp
 import pymapp.shared_memory
+from platform import python_version
 
 @pytest.fixture
 def get_mapp_class():
@@ -101,10 +103,14 @@ def test_register_setup(get_mapp_class:pymapp.MApp):
 def test_run():
     from application import MyTestApplication
     my_test = MyTestApplication()
+    log_filename = f"{os.getenv("GITHUB_ACTION")}_{os.getenv("GITHUB_JOB")}_{platform.python_version()}.log"
+    my_test._logger_writer.config["filename"] = log_filename
     my_test.start()
-    with open('logs/log.log', 'r') as fid:
+    with open(os.path.join('logs', log_filename), 'r') as fid:
         log_text = fid.read()
     
+    print('\n\n\n\nBREAK BREAK')
+    print(log_text)
     # assert "Starting process log" in log_text
     # assert "Started process log" in log_text
     # assert "Logger initialized" in log_text

@@ -42,6 +42,5 @@ jobs:
         pytest -m "not serial"
         echo BREAK BREAK
         rm logs/log.log
-        pytest -m "serial"
+        pytest -m "serial" -s
         echo BREAK BREAK
-        echo $GITHUB_ACTION $GITHUB_JOB
